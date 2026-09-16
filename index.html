@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="هرم الإتقان">
+<meta name="theme-color" content="#1C1712">
+<title>هرم الإتقان</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1C1712; --bg-deep:#120E0A;
+  --card:#F3ECDC; --card-shadow:rgba(0,0,0,.35);
+  --ink:#2B2620; --ink-sub:#6B6255; --ink-faint:#A69C89;
+  --gold:#C9A227; --gold-bg:rgba(201,162,39,.14);
+  --sage:#4C7A5E; --sage-bg:rgba(76,122,94,.14);
+  --sand:#8A7F68; --sand-bg:rgba(138,127,104,.14);
+  --brick:#A24A42; --brick-bg:rgba(162,74,66,.12);
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Cairo',sans-serif;background:var(--bg);color:var(--card);min-height:100vh;padding-bottom:90px;}
+.mono{font-family:'Space Mono',monospace;}
+header{position:sticky;top:0;z-index:10;background:var(--bg);padding:16px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(243,236,220,.08);}
+header h1{font-size:1.15rem;margin:0;font-weight:800;}
+header h1 span{color:var(--gold);}
+.icon-btn{background:none;border:none;color:var(--card);font-size:22px;cursor:pointer;padding:6px;opacity:.85;}
+.icon-btn:active{opacity:1;}
+nav.tabs{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;}
+nav.tabs button{flex:none;background:rgba(243,236,220,.06);border:1px solid rgba(243,236,220,.12);color:var(--ink-faint);padding:8px 14px;border-radius:20px;font-family:'Cairo';font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+nav.tabs button.active{background:var(--gold);color:#1C1712;border-color:var(--gold);}
+main{padding:8px 14px 20px;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* Overview / pyramid */
+.pyramid-wrap{padding:18px 6px 8px;}
+.pyramid{width:100%;max-width:320px;margin:0 auto;display:block;}
+.legend{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+.legend-row{display:flex;align-items:center;gap:10px;background:rgba(243,236,220,.05);border-radius:12px;padding:12px 14px;}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex:none;}
+.legend-text{flex:1;}
+.legend-text b{display:block;font-size:.92rem;}
+.legend-text span{color:var(--ink-faint);font-size:.76rem;}
+.legend-count{font-family:'Space Mono';font-size:1.3rem;font-weight:700;}
+
+/* Item cards */
+.card{background:var(--card);color:var(--ink);border-radius:var(--radius);padding:14px 15px;margin-bottom:11px;box-shadow:0 3px 10px var(--card-shadow);}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.card-name{font-weight:700;font-size:.98rem;}
+.card-menu{background:none;border:none;color:var(--ink-sub);font-size:20px;cursor:pointer;padding:0 4px;}
+.progress-row{display:flex;align-items:center;gap:8px;margin-top:9px;}
+.progress-track{flex:1;height:8px;border-radius:5px;background:rgba(43,38,32,.1);overflow:hidden;}
+.progress-fill{height:100%;border-radius:5px;}
+.progress-label{font-family:'Space Mono';font-size:.72rem;color:var(--ink-sub);white-space:nowrap;}
+.card-actions{display:flex;gap:8px;margin-top:12px;}
+.btn{border:none;border-radius:9px;padding:8px 12px;font-family:'Cairo';font-size:.78rem;font-weight:700;cursor:pointer;flex:1;}
+.btn-log{background:var(--gold-bg);color:#8a6a12;}
+.btn-promote{background:var(--sage-bg);color:var(--sage);}
+.empty-hint{text-align:center;color:var(--ink-faint);padding:40px 20px;font-size:.88rem;}
+
+.fab{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--gold);color:#1C1712;border:none;border-radius:30px;padding:13px 26px;font-family:'Cairo';font-weight:800;font-size:.9rem;box-shadow:0 6px 18px rgba(0,0,0,.4);cursor:pointer;z-index:20;}
+
+/* Overlay / modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;z-index:50;}
+.overlay.open{display:flex;}
+.sheet{background:var(--card);color:var(--ink);width:100%;border-radius:20px 20px 0 0;padding:20px 20px 26px;max-height:88vh;overflow-y:auto;}
+.sheet h2{margin:0 0 14px;font-size:1.05rem;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:.8rem;color:var(--ink-sub);margin-bottom:5px;font-weight:600;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border-radius:9px;border:1px solid rgba(43,38,32,.18);font-family:'Cairo';font-size:.92rem;background:#fff;color:var(--ink);}
+.field textarea{resize:vertical;min-height:60px;}
+.seg{display:flex;gap:8px;}
+.seg button{flex:1;padding:10px;border-radius:9px;border:1px solid rgba(43,38,32,.18);background:#fff;font-family:'Cairo';font-weight:700;font-size:.82rem;cursor:pointer;color:var(--ink-sub);}
+.seg button.sel{background:var(--gold);border-color:var(--gold);color:#1C1712;}
+.sheet-actions{display:flex;gap:10px;margin-top:6px;}
+.sheet-actions .btn{padding:12px;font-size:.88rem;}
+.btn-primary{background:var(--gold);color:#1C1712;}
+.btn-danger{background:var(--brick-bg);color:var(--brick);}
+.btn-ghost{background:rgba(43,38,32,.06);color:var(--ink-sub);}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:#2B2620;color:var(--card);padding:10px 18px;border-radius:20px;font-size:.82rem;opacity:0;transition:.25s;pointer-events:none;z-index:60;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>هرم <span>الإتقان</span></h1>
+  <div style="display:flex;gap:4px;">
+    <button class="icon-btn" onclick="syncNow()" title="مزامنة">⟳</button>
+    <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="overview" class="active" onclick="switchTab('overview')">نظرة عامة</button>
+  <button data-tab="s2" onclick="switchTab('s2')">المرحلة الثانية · 24 ساعة</button>
+  <button data-tab="s1" onclick="switchTab('s1')">المرحلة الأولى · 10,000 ساعة</button>
+</nav>
+
+<main>
+  <section id="sec-overview" class="section active">
+    <div class="pyramid-wrap">
+      <svg class="pyramid" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="150,10 220,80 80,80" fill="var(--gold)" opacity="0.9"/>
+        <polygon points="80,84 220,84 260,150 40,150" fill="var(--sage)" opacity="0.9"/>
+        <polygon points="40,154 260,154 300,214 0,214" fill="var(--sand)" opacity="0.55"/>
+        <text x="150" y="50" text-anchor="middle" fill="#1C1712" font-family="Cairo" font-weight="800" font-size="12">1%</text>
+        <text x="150" y="122" text-anchor="middle" fill="#0f1a15" font-family="Cairo" font-weight="800" font-size="12">4%</text>
+        <text x="150" y="188" text-anchor="middle" fill="#2b2620" font-family="Cairo" font-weight="700" font-size="11">البقية</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <div class="legend-row">
+        <div class="legend-dot" style="background:var(--gold)"></div>
+        <div class="legend-text"><b>المرحلة الأولى — 10,000 ساعة</b><span>إتقان عميق لمهارة محددة</span></div>
+        <div class="legend-count mono" id="count-s1" style="color:var(--gold)">0</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:var(--sage)"></div>
+        <div class="legend-text"><b>المرحلة الثانية — 24 ساعة</b><span>تعلّم أساسيات شيء جديد بسرعة</span></div>
+        <div class="legend-count mono" id="count-s2" style="color:var(--sage)">0</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:var(--sand)"></div>
+        <div class="legend-text"><b>باقي الهرم</b><span>يشمل كل الناس — بدون تتبّع</span></div>
+        <div class="legend-count mono" style="color:var(--sand)">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sec-s2" class="section">
+    <div id="list-s2"></div>
+  </section>
+
+  <section id="sec-s1" class="section">
+    <div id="list-s1"></div>
+  </section>
+</main>
+
+<button class="fab" onclick="openAddModal()">+ إضافة شيء جديد</button>
+
+<!-- Add / Edit item modal -->
+<div class="overlay" id="itemOverlay">
+  <div class="sheet">
+    <h2 id="itemModalTitle">إضافة شيء جديد للتعلّم</h2>
+    <div class="field">
+      <label>الاسم</label>
+      <input type="text" id="itemName" placeholder="مثال: العزف على العود">
+    </div>
+    <div class="field">
+      <label>المرحلة</label>
+      <div class="seg">
+        <button id="stageBtn2" class="sel" onclick="pickStage(2)">المرحلة الثانية (24 ساعة)</button>
+        <button id="stageBtn1" onclick="pickStage(1)">المرحلة الأولى (10,000 ساعة)</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>هدف الساعات</label>
+      <input type="number" id="itemTarget" value="24" min="1">
+    </div>
+    <div class="field">
+      <label>ملاحظات (اختياري)</label>
+      <textarea id="itemNotes" placeholder="ليش هالشي مهم إلك؟"></textarea>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" onclick="closeModal('itemOverlay')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveItem()">حفظ</button>
+    </div>
+    <div class="sheet-actions" id="deleteRow" style="display:none;margin-top:8px;">
+      <button class="btn btn-danger" onclick="deleteItem()">حذف هالعنصر</button>
+    </div>
+  </div>
+</div>
+
+<!-- Log time modal -->
+<div class="overlay" id="logOverlay">
+  <div class="sheet">
+    <h2>تسجيل وقت</h2>
+    <div class="field">
+      <label>عدد الساعات</label>
+      <input type="number" id="logHours" step="0.25" min="0.25" placeholder="مثال: 1.5">
+    </div>
+    <div class="field">
+      <label>ملاحظة (اختياري)</label>
+      <input type="text" id="logNote" placeholder="شو سويت بهالجلسة؟">
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" onclick="closeModal('logOverlay')">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitLog()">إضافة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="overlay" id="settingsOverlay">
+  <div class="sheet">
+    <h2>المزامنة مع Google Sheets</h2>
+    <div class="field">
+      <label>رابط Web App</label>
+      <input type="text" id="webAppUrlInput" placeholder="https://script.google.com/macros/s/....../exec">
+    </div>
+    <p style="font-size:.78rem;color:var(--ink-sub);line-height:1.6;">
+      انسخ رابط الـ Web App بعد ما تنشر Google Apps Script المرفق (Code.gs)، والصقه هون. البرنامج رح يخزّن كل شي محليًا حتى لو ما ضفت رابط.
+    </p>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" onclick="closeModal('settingsOverlay')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveSettings()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LOCAL_KEY = 'pyramid_items_v1';
+const CONFIG_KEY = 'pyramid_config_v1';
+const DEFAULT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzZgoXv6so2HBG7yVoloK79k6jYLWdK7nWUi004luQ3P52U62pcaO3kosfnO1Wp0pKf/exec';
+let CONFIG = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+if (!CONFIG.WEB_APP_URL) CONFIG.WEB_APP_URL = DEFAULT_WEB_APP_URL;
+let items = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+let editingId = null;
+let pickedStage = 2;
+let logTargetId = null;
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function now(){ return new Date().toISOString(); }
+function saveLocal(){ localStorage.setItem(LOCAL_KEY, JSON.stringify(items)); }
+let _t; function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_t); _t=setTimeout(()=>t.classList.remove('show'),2600); }
+
+function switchTab(tab){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+tab).classList.add('active');
+  render();
+}
+
+function render(){
+  const s1 = items.filter(i=>i.stage===1);
+  const s2 = items.filter(i=>i.stage===2);
+  document.getElementById('count-s1').textContent = s1.length;
+  document.getElementById('count-s2').textContent = s2.length;
+  renderList('list-s1', s1, 'var(--gold)');
+  renderList('list-s2', s2, 'var(--sage)');
+}
+
+function renderList(elId, list, color){
+  const el = document.getElementById(elId);
+  if(!list.length){ el.innerHTML = '<div class="empty-hint">ولا شي هون لسا — دوس على «إضافة شيء جديد»</div>'; return; }
+  list.sort((a,b)=> new Date(b.updatedAt) - new Date(a.updatedAt));
+  el.innerHTML = list.map(i=>{
+    const pct = Math.min(100, Math.round((i.logged / i.target) * 100));
+    return `<div class="card">
+      <div class="card-top">
+        <div class="card-name">${escHtml(i.name)}</div>
+        <button class="card-menu" onclick="openEditModal('${i.id}')">⋮</button>
+      </div>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="progress-label">${fmtNum(i.logged)} / ${fmtNum(i.target)} ساعة</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-log" onclick="openLogModal('${i.id}')">+ سجّل وقت</button>
+        ${i.stage===2 ? `<button class="btn btn-promote" onclick="promoteItem('${i.id}')">ترقية للمرحلة الأولى</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function fmtNum(n){ return (Math.round(n*100)/100).toString(); }
+function escHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+// ---- Add / Edit item ----
+function openAddModal(){
+  editingId = null;
+  document.getElementById('itemModalTitle').textContent = 'إضافة شيء جديد للتعلّم';
+  document.getElementById('itemName').value = '';
+  document.getElementById('itemNotes').value = '';
+  document.getElementById('deleteRow').style.display = 'none';
+  pickStage(2);
+  openModal('itemOverlay');
+}
+function openEditModal(id){
+  const it = items.find(x=>x.id===id);
+  if(!it) return;
+  editingId = id;
+  document.getElementById('itemModalTitle').textContent = 'تعديل';
+  document.getElementById('itemName').value = it.name;
+  document.getElementById('itemNotes').value = it.notes || '';
+  document.getElementById('itemTarget').value = it.target;
+  document.getElementById('deleteRow').style.display = 'flex';
+  pickStage(it.stage);
+  openModal('itemOverlay');
+}
+function pickStage(s){
+  pickedStage = s;
+  document.getElementById('stageBtn2').classList.toggle('sel', s===2);
+  document.getElementById('stageBtn1').classList.toggle('sel', s===1);
+  if(!editingId) document.getElementById('itemTarget').value = s===2 ? 24 : 10000;
+}
+function saveItem(){
+  const name = document.getElementById('itemName').value.trim();
+  const target = parseFloat(document.getElementById('itemTarget').value) || (pickedStage===2?24:10000);
+  const notes = document.getElementById('itemNotes').value.trim();
+  if(!name){ toast('لازم تكتب اسم'); return; }
+  if(editingId){
+    const it = items.find(x=>x.id===editingId);
+    it.name = name; it.target = target; it.notes = notes; it.stage = pickedStage; it.updatedAt = now();
+  } else {
+    items.push({ id: uid(), name, stage: pickedStage, target, logged: 0, status:'active', notes, entries: [], createdAt: now(), updatedAt: now() });
+  }
+  saveLocal(); closeModal('itemOverlay'); render(); toast('تم الحفظ');
+}
+function deleteItem(){
+  if(!editingId) return;
+  items = items.filter(x=>x.id!==editingId);
+  saveLocal(); closeModal('itemOverlay'); render(); toast('تم الحذف');
+}
+function promoteItem(id){
+  const it = items.find(x=>x.id===id);
+  if(!it) return;
+  if(!confirm(`ترقية "${it.name}" للمرحلة الأولى (10,000 ساعة)؟`)) return;
+  it.stage = 1; it.target = 10000; it.updatedAt = now();
+  it.entries.push({ date: now(), hours: 0, note: 'تمت الترقية إلى مرحلة الـ10,000 ساعة' });
+  saveLocal(); render(); toast('تمت الترقية 🎉');
+}
+
+// ---- Log time ----
+function openLogModal(id){
+  logTargetId = id;
+  document.getElementById('logHours').value = '';
+  document.getElementById('logNote').value = '';
+  openModal('logOverlay');
+}
+function submitLog(){
+  const hrs = parseFloat(document.getElementById('logHours').value);
+  const note = document.getElementById('logNote').value.trim();
+  if(!hrs || hrs<=0){ toast('اكتب عدد ساعات صحيح'); return; }
+  const it = items.find(x=>x.id===logTargetId);
+  if(!it) return;
+  it.entries.push({ date: now(), hours: hrs, note });
+  it.logged += hrs; it.updatedAt = now();
+  saveLocal(); closeModal('logOverlay'); render(); toast('تمت الإضافة');
+}
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov) closeModal(ov.id); });
+});
+
+// ---- Settings / Sync ----
+function openSettings(){
+  document.getElementById('webAppUrlInput').value = CONFIG.WEB_APP_URL || '';
+  openModal('settingsOverlay');
+}
+function saveSettings(){
+  CONFIG.WEB_APP_URL = document.getElementById('webAppUrlInput').value.trim();
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(CONFIG));
+  closeModal('settingsOverlay'); toast('تم الحفظ');
+}
+function hasValidConfig(){ return CONFIG.WEB_APP_URL && CONFIG.WEB_APP_URL.startsWith('http'); }
+
+async function syncNow(){
+  if(!hasValidConfig()){ toast('ضيف رابط Google Sheets من الإعدادات أول'); openSettings(); return; }
+  toast('جاري المزامنة...');
+  try{
+    const res = await fetch(CONFIG.WEB_APP_URL);
+    const remote = await res.json();
+    const merged = mergeItems(items, Array.isArray(remote) ? remote : []);
+    items = merged;
+    saveLocal();
+    await fetch(CONFIG.WEB_APP_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify(items)
+    });
+    render();
+    toast('تمت المزامنة ✓');
+  }catch(err){
+    console.error('sync failed', err);
+    toast('فشلت المزامنة — تأكد من الرابط');
+  }
+}
+function mergeItems(local, remote){
+  const map = {};
+  local.forEach(i=> map[i.id] = i);
+  remote.forEach(r=>{
+    const l = map[r.id];
+    if(!l || new Date(r.updatedAt) > new Date(l.updatedAt)) map[r.id] = r;
+  });
+  return Object.values(map);
+}
+
+render();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>
