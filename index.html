@@ -18,85 +18,119 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#1C1712; --bg-deep:#120E0A;
-  --card:#F3ECDC; --card-shadow:rgba(0,0,0,.35);
+  --bg:#1C1712; --bg-deep:#120E0A; --bg-soft:#241D16;
+  --card:#F3ECDC; --card-shadow:rgba(0,0,0,.4);
   --ink:#2B2620; --ink-sub:#6B6255; --ink-faint:#A69C89;
-  --gold:#C9A227; --gold-bg:rgba(201,162,39,.14);
-  --sage:#4C7A5E; --sage-bg:rgba(76,122,94,.14);
+  --gold:#D4AF37; --gold-deep:#9C7A1E; --gold-bg:rgba(212,175,55,.14);
+  --sage:#5B9279; --sage-deep:#3B5F4C; --sage-bg:rgba(91,146,121,.14);
   --sand:#8A7F68; --sand-bg:rgba(138,127,104,.14);
   --brick:#A24A42; --brick-bg:rgba(162,74,66,.12);
-  --radius:14px;
+  --radius:16px;
 }
-*{box-sizing:border-box;}
-body{margin:0;font-family:'Cairo',sans-serif;background:var(--bg);color:var(--card);min-height:100vh;padding-bottom:90px;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{margin:0;font-family:'Cairo',sans-serif;color:var(--card);min-height:100vh;padding-bottom:96px;
+  background:
+    radial-gradient(ellipse 500px 300px at 50% -80px, rgba(212,175,55,.10), transparent 60%),
+    var(--bg);
+}
 .mono{font-family:'Space Mono',monospace;}
-header{position:sticky;top:0;z-index:10;background:var(--bg);padding:16px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(243,236,220,.08);}
-header h1{font-size:1.15rem;margin:0;font-weight:800;}
+
+header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, var(--bg) 70%, rgba(28,23,18,0));backdrop-filter:blur(6px);padding:18px 18px 12px;display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-mark{width:30px;height:30px;flex:none;}
+header h1{font-size:1.12rem;margin:0;font-weight:800;letter-spacing:.2px;}
 header h1 span{color:var(--gold);}
-.icon-btn{background:none;border:none;color:var(--card);font-size:22px;cursor:pointer;padding:6px;opacity:.85;}
-.icon-btn:active{opacity:1;}
-nav.tabs{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;}
-nav.tabs button{flex:none;background:rgba(243,236,220,.06);border:1px solid rgba(243,236,220,.12);color:var(--ink-faint);padding:8px 14px;border-radius:20px;font-family:'Cairo';font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;}
-nav.tabs button.active{background:var(--gold);color:#1C1712;border-color:var(--gold);}
-main{padding:8px 14px 20px;}
-.section{display:none;}
+.header-btns{display:flex;gap:2px;}
+.icon-btn{background:rgba(243,236,220,.06);border:1px solid rgba(243,236,220,.1);color:var(--card);font-size:16px;cursor:pointer;padding:8px;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.icon-btn:active{transform:scale(.92);background:rgba(243,236,220,.12);}
+
+nav.tabs{display:flex;gap:8px;padding:6px 14px 14px;overflow-x:auto;}
+nav.tabs button{flex:none;display:flex;align-items:center;gap:6px;background:rgba(243,236,220,.05);border:1px solid rgba(243,236,220,.1);color:var(--ink-faint);padding:9px 16px;border-radius:22px;font-family:'Cairo';font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:.18s;}
+nav.tabs button .dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.7;}
+nav.tabs button.active{background:var(--gold);color:#1C1712;border-color:var(--gold);box-shadow:0 4px 14px rgba(212,175,55,.25);}
+nav.tabs button:active{transform:scale(.96);}
+
+main{padding:4px 14px 20px;}
+.section{display:none;animation:fadein .28s ease;}
 .section.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
 /* Overview / pyramid */
-.pyramid-wrap{padding:18px 6px 8px;}
-.pyramid{width:100%;max-width:320px;margin:0 auto;display:block;}
-.legend{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
-.legend-row{display:flex;align-items:center;gap:10px;background:rgba(243,236,220,.05);border-radius:12px;padding:12px 14px;}
-.legend-dot{width:12px;height:12px;border-radius:3px;flex:none;}
+.stat-strip{display:flex;gap:10px;margin:6px 0 4px;}
+.stat-box{flex:1;background:rgba(243,236,220,.05);border:1px solid rgba(243,236,220,.08);border-radius:14px;padding:12px 14px;text-align:center;}
+.stat-box .num{font-family:'Space Mono';font-size:1.25rem;font-weight:700;color:var(--gold);}
+.stat-box .lbl{font-size:.7rem;color:var(--ink-faint);margin-top:2px;}
+
+.pyramid-wrap{padding:22px 6px 6px;filter:drop-shadow(0 12px 20px rgba(0,0,0,.45));}
+.pyramid{width:100%;max-width:290px;margin:0 auto;display:block;}
+.legend{display:flex;flex-direction:column;gap:10px;margin-top:20px;}
+.legend-row{display:flex;align-items:center;gap:12px;background:rgba(243,236,220,.045);border:1px solid rgba(243,236,220,.07);border-radius:14px;padding:13px 15px;transition:.15s;}
+.legend-row:active{background:rgba(243,236,220,.08);}
+.legend-dot{width:34px;height:34px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:15px;}
 .legend-text{flex:1;}
-.legend-text b{display:block;font-size:.92rem;}
-.legend-text span{color:var(--ink-faint);font-size:.76rem;}
-.legend-count{font-family:'Space Mono';font-size:1.3rem;font-weight:700;}
+.legend-text b{display:block;font-size:.9rem;}
+.legend-text span{color:var(--ink-faint);font-size:.74rem;line-height:1.5;}
+.legend-count{font-family:'Space Mono';font-size:1.4rem;font-weight:700;}
 
 /* Item cards */
-.card{background:var(--card);color:var(--ink);border-radius:var(--radius);padding:14px 15px;margin-bottom:11px;box-shadow:0 3px 10px var(--card-shadow);}
+.card{position:relative;background:var(--card);color:var(--ink);border-radius:var(--radius);padding:15px 16px 15px 15px;margin-bottom:12px;box-shadow:0 4px 14px var(--card-shadow);overflow:hidden;animation:cardin .3s ease backwards;}
+.card::before{content:'';position:absolute;top:0;right:0;bottom:0;width:5px;background:var(--accent,var(--gold));}
+@keyframes cardin{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-.card-name{font-weight:700;font-size:.98rem;}
-.card-menu{background:none;border:none;color:var(--ink-sub);font-size:20px;cursor:pointer;padding:0 4px;}
-.progress-row{display:flex;align-items:center;gap:8px;margin-top:9px;}
-.progress-track{flex:1;height:8px;border-radius:5px;background:rgba(43,38,32,.1);overflow:hidden;}
-.progress-fill{height:100%;border-radius:5px;}
-.progress-label{font-family:'Space Mono';font-size:.72rem;color:var(--ink-sub);white-space:nowrap;}
-.card-actions{display:flex;gap:8px;margin-top:12px;}
-.btn{border:none;border-radius:9px;padding:8px 12px;font-family:'Cairo';font-size:.78rem;font-weight:700;cursor:pointer;flex:1;}
-.btn-log{background:var(--gold-bg);color:#8a6a12;}
-.btn-promote{background:var(--sage-bg);color:var(--sage);}
-.empty-hint{text-align:center;color:var(--ink-faint);padding:40px 20px;font-size:.88rem;}
+.card-name{font-weight:700;font-size:.98rem;line-height:1.35;}
+.card-notes{font-size:.72rem;color:var(--ink-sub);margin-top:2px;}
+.card-menu{background:rgba(43,38,32,.05);border:none;color:var(--ink-sub);font-size:18px;cursor:pointer;padding:3px 9px;border-radius:8px;flex:none;}
+.card-menu:active{background:rgba(43,38,32,.1);}
+.progress-row{display:flex;align-items:center;gap:10px;margin-top:12px;}
+.progress-track{flex:1;height:9px;border-radius:6px;background:rgba(43,38,32,.1);overflow:hidden;}
+.progress-fill{height:100%;border-radius:6px;transition:width .4s ease;}
+.progress-pct{font-family:'Space Mono';font-size:.78rem;font-weight:700;color:var(--ink);min-width:34px;text-align:left;}
+.progress-label{font-family:'Space Mono';font-size:.68rem;color:var(--ink-faint);margin-top:5px;}
+.card-actions{display:flex;gap:8px;margin-top:13px;}
+.btn{border:none;border-radius:10px;padding:9px 12px;font-family:'Cairo';font-size:.78rem;font-weight:700;cursor:pointer;flex:1;transition:.12s;}
+.btn:active{transform:scale(.96);}
+.btn-log{background:var(--gold-bg);color:var(--gold-deep);}
+.btn-promote{background:var(--sage-bg);color:var(--sage-deep);}
+.empty-hint{text-align:center;color:var(--ink-faint);padding:52px 20px;font-size:.86rem;line-height:1.8;}
+.empty-hint .big{font-size:2rem;display:block;margin-bottom:8px;opacity:.6;}
 
-.fab{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--gold);color:#1C1712;border:none;border-radius:30px;padding:13px 26px;font-family:'Cairo';font-weight:800;font-size:.9rem;box-shadow:0 6px 18px rgba(0,0,0,.4);cursor:pointer;z-index:20;}
+.fab{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--gold);color:#1C1712;border:none;border-radius:30px;padding:14px 28px;font-family:'Cairo';font-weight:800;font-size:.88rem;box-shadow:0 8px 22px rgba(212,175,55,.35);cursor:pointer;z-index:20;display:flex;align-items:center;gap:8px;transition:.15s;}
+.fab:active{transform:translateX(-50%) scale(.95);}
 
 /* Overlay / modal */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;z-index:50;}
-.overlay.open{display:flex;}
-.sheet{background:var(--card);color:var(--ink);width:100%;border-radius:20px 20px 0 0;padding:20px 20px 26px;max-height:88vh;overflow-y:auto;}
-.sheet h2{margin:0 0 14px;font-size:1.05rem;}
+.overlay{position:fixed;inset:0;background:rgba(10,8,6,.6);backdrop-filter:blur(2px);display:none;align-items:flex-end;z-index:50;}
+.overlay.open{display:flex;animation:fadein .2s ease;}
+.sheet{background:var(--card);color:var(--ink);width:100%;border-radius:22px 22px 0 0;padding:10px 20px 26px;max-height:88vh;overflow-y:auto;animation:slideup .25s cubic-bezier(.2,.8,.3,1);}
+@keyframes slideup{from{transform:translateY(30px);opacity:.6;}to{transform:translateY(0);opacity:1;}}
+.sheet-handle{width:38px;height:4px;background:rgba(43,38,32,.2);border-radius:3px;margin:8px auto 16px;}
+.sheet h2{margin:0 0 16px;font-size:1.05rem;font-weight:800;}
 .field{margin-bottom:14px;}
-.field label{display:block;font-size:.8rem;color:var(--ink-sub);margin-bottom:5px;font-weight:600;}
-.field input,.field select,.field textarea{width:100%;padding:10px 12px;border-radius:9px;border:1px solid rgba(43,38,32,.18);font-family:'Cairo';font-size:.92rem;background:#fff;color:var(--ink);}
+.field label{display:block;font-size:.78rem;color:var(--ink-sub);margin-bottom:6px;font-weight:700;}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid rgba(43,38,32,.14);font-family:'Cairo';font-size:.92rem;background:#fff;color:var(--ink);transition:.15s;}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--gold);}
 .field textarea{resize:vertical;min-height:60px;}
 .seg{display:flex;gap:8px;}
-.seg button{flex:1;padding:10px;border-radius:9px;border:1px solid rgba(43,38,32,.18);background:#fff;font-family:'Cairo';font-weight:700;font-size:.82rem;cursor:pointer;color:var(--ink-sub);}
+.seg button{flex:1;padding:11px;border-radius:10px;border:1.5px solid rgba(43,38,32,.14);background:#fff;font-family:'Cairo';font-weight:700;font-size:.8rem;cursor:pointer;color:var(--ink-sub);transition:.15s;}
 .seg button.sel{background:var(--gold);border-color:var(--gold);color:#1C1712;}
-.sheet-actions{display:flex;gap:10px;margin-top:6px;}
-.sheet-actions .btn{padding:12px;font-size:.88rem;}
+.sheet-actions{display:flex;gap:10px;margin-top:8px;}
+.sheet-actions .btn{padding:13px;font-size:.86rem;}
 .btn-primary{background:var(--gold);color:#1C1712;}
 .btn-danger{background:var(--brick-bg);color:var(--brick);}
 .btn-ghost{background:rgba(43,38,32,.06);color:var(--ink-sub);}
 
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:#2B2620;color:var(--card);padding:10px 18px;border-radius:20px;font-size:.82rem;opacity:0;transition:.25s;pointer-events:none;z-index:60;}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:#2B2620;color:var(--card);padding:11px 20px;border-radius:22px;font-size:.82rem;opacity:0;transition:.25s;pointer-events:none;z-index:60;box-shadow:0 6px 16px rgba(0,0,0,.3);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>هرم <span>الإتقان</span></h1>
-  <div style="display:flex;gap:4px;">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 40 40"><polygon points="20,7 28,22 12,22" fill="var(--gold)"/><polygon points="12,24 28,24 33,34 7,34" fill="var(--sage)"/></svg>
+    <h1>هرم <span>الإتقان</span></h1>
+  </div>
+  <div class="header-btns">
     <button class="icon-btn" onclick="syncNow()" title="مزامنة">⟳</button>
     <button class="icon-btn" onclick="openSettings()" title="الإعدادات">⚙</button>
   </div>
@@ -104,35 +138,53 @@ main{padding:8px 14px 20px;}
 
 <nav class="tabs">
   <button data-tab="overview" class="active" onclick="switchTab('overview')">نظرة عامة</button>
-  <button data-tab="s2" onclick="switchTab('s2')">المرحلة الثانية · 24 ساعة</button>
-  <button data-tab="s1" onclick="switchTab('s1')">المرحلة الأولى · 10,000 ساعة</button>
+  <button data-tab="s2" onclick="switchTab('s2')"><span class="dot" style="color:var(--sage)"></span> المرحلة الثانية · 24 ساعة</button>
+  <button data-tab="s1" onclick="switchTab('s1')"><span class="dot" style="color:var(--gold-deep)"></span> المرحلة الأولى · 10,000 ساعة</button>
 </nav>
 
 <main>
   <section id="sec-overview" class="section active">
+    <div class="stat-strip">
+      <div class="stat-box"><div class="num mono" id="stat-total-hours">0</div><div class="lbl">إجمالي الساعات</div></div>
+      <div class="stat-box"><div class="num mono" id="stat-total-items">0</div><div class="lbl">أشياء قيد التتبّع</div></div>
+    </div>
     <div class="pyramid-wrap">
       <svg class="pyramid" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="150,10 220,80 80,80" fill="var(--gold)" opacity="0.9"/>
-        <polygon points="80,84 220,84 260,150 40,150" fill="var(--sage)" opacity="0.9"/>
-        <polygon points="40,154 260,154 300,214 0,214" fill="var(--sand)" opacity="0.55"/>
+        <defs>
+          <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#E8C868"/>
+            <stop offset="100%" stop-color="#C9962A"/>
+          </linearGradient>
+          <linearGradient id="gSage" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6FA688"/>
+            <stop offset="100%" stop-color="#456B57"/>
+          </linearGradient>
+          <linearGradient id="gSand" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#9C9078"/>
+            <stop offset="100%" stop-color="#726852"/>
+          </linearGradient>
+        </defs>
+        <polygon points="150,10 220,80 80,80" fill="url(#gGold)"/>
+        <polygon points="80,84 220,84 260,150 40,150" fill="url(#gSage)"/>
+        <polygon points="40,154 260,154 300,214 0,214" fill="url(#gSand)" opacity="0.85"/>
         <text x="150" y="50" text-anchor="middle" fill="#1C1712" font-family="Cairo" font-weight="800" font-size="12">1%</text>
         <text x="150" y="122" text-anchor="middle" fill="#0f1a15" font-family="Cairo" font-weight="800" font-size="12">4%</text>
-        <text x="150" y="188" text-anchor="middle" fill="#2b2620" font-family="Cairo" font-weight="700" font-size="11">البقية</text>
+        <text x="150" y="188" text-anchor="middle" fill="#241f18" font-family="Cairo" font-weight="700" font-size="11">البقية</text>
       </svg>
     </div>
     <div class="legend">
       <div class="legend-row">
-        <div class="legend-dot" style="background:var(--gold)"></div>
+        <div class="legend-dot" style="background:var(--gold-bg)">👑</div>
         <div class="legend-text"><b>المرحلة الأولى — 10,000 ساعة</b><span>إتقان عميق لمهارة محددة</span></div>
         <div class="legend-count mono" id="count-s1" style="color:var(--gold)">0</div>
       </div>
       <div class="legend-row">
-        <div class="legend-dot" style="background:var(--sage)"></div>
+        <div class="legend-dot" style="background:var(--sage-bg)">🌱</div>
         <div class="legend-text"><b>المرحلة الثانية — 24 ساعة</b><span>تعلّم أساسيات شيء جديد بسرعة</span></div>
         <div class="legend-count mono" id="count-s2" style="color:var(--sage)">0</div>
       </div>
       <div class="legend-row">
-        <div class="legend-dot" style="background:var(--sand)"></div>
+        <div class="legend-dot" style="background:var(--sand-bg)">🌍</div>
         <div class="legend-text"><b>باقي الهرم</b><span>يشمل كل الناس — بدون تتبّع</span></div>
         <div class="legend-count mono" style="color:var(--sand)">—</div>
       </div>
@@ -148,11 +200,12 @@ main{padding:8px 14px 20px;}
   </section>
 </main>
 
-<button class="fab" onclick="openAddModal()">+ إضافة شيء جديد</button>
+<button class="fab" onclick="openAddModal()"><span style="font-size:1.1em">+</span> إضافة شيء جديد</button>
 
 <!-- Add / Edit item modal -->
 <div class="overlay" id="itemOverlay">
   <div class="sheet">
+    <div class="sheet-handle"></div>
     <h2 id="itemModalTitle">إضافة شيء جديد للتعلّم</h2>
     <div class="field">
       <label>الاسم</label>
@@ -186,6 +239,7 @@ main{padding:8px 14px 20px;}
 <!-- Log time modal -->
 <div class="overlay" id="logOverlay">
   <div class="sheet">
+    <div class="sheet-handle"></div>
     <h2>تسجيل وقت</h2>
     <div class="field">
       <label>عدد الساعات</label>
@@ -205,6 +259,7 @@ main{padding:8px 14px 20px;}
 <!-- Settings modal -->
 <div class="overlay" id="settingsOverlay">
   <div class="sheet">
+    <div class="sheet-handle"></div>
     <h2>المزامنة مع Google Sheets</h2>
     <div class="field">
       <label>رابط Web App</label>
@@ -250,25 +305,32 @@ function render(){
   const s2 = items.filter(i=>i.stage===2);
   document.getElementById('count-s1').textContent = s1.length;
   document.getElementById('count-s2').textContent = s2.length;
-  renderList('list-s1', s1, 'var(--gold)');
-  renderList('list-s2', s2, 'var(--sage)');
+  document.getElementById('stat-total-items').textContent = items.length;
+  const totalHours = items.reduce((sum,i)=> sum + (i.logged||0), 0);
+  document.getElementById('stat-total-hours').textContent = fmtNum(totalHours);
+  renderList('list-s1', s1, 'var(--gold)', 'var(--gold)');
+  renderList('list-s2', s2, 'var(--sage)', 'var(--sage)');
 }
 
-function renderList(elId, list, color){
+function renderList(elId, list, color, accent){
   const el = document.getElementById(elId);
-  if(!list.length){ el.innerHTML = '<div class="empty-hint">ولا شي هون لسا — دوس على «إضافة شيء جديد»</div>'; return; }
+  if(!list.length){ el.innerHTML = '<div class="empty-hint"><span class="big">🏔️</span>ولا شي هون لسا<br>دوس على «إضافة شيء جديد» تحت</div>'; return; }
   list.sort((a,b)=> new Date(b.updatedAt) - new Date(a.updatedAt));
-  el.innerHTML = list.map(i=>{
+  el.innerHTML = list.map((i,idx)=>{
     const pct = Math.min(100, Math.round((i.logged / i.target) * 100));
-    return `<div class="card">
+    return `<div class="card" style="--accent:${accent};animation-delay:${idx*0.04}s">
       <div class="card-top">
-        <div class="card-name">${escHtml(i.name)}</div>
+        <div>
+          <div class="card-name">${escHtml(i.name)}</div>
+          ${i.notes ? `<div class="card-notes">${escHtml(i.notes)}</div>` : ''}
+        </div>
         <button class="card-menu" onclick="openEditModal('${i.id}')">⋮</button>
       </div>
       <div class="progress-row">
         <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
-        <div class="progress-label">${fmtNum(i.logged)} / ${fmtNum(i.target)} ساعة</div>
+        <div class="progress-pct">${pct}%</div>
       </div>
+      <div class="progress-label">${fmtNum(i.logged)} من ${fmtNum(i.target)} ساعة</div>
       <div class="card-actions">
         <button class="btn btn-log" onclick="openLogModal('${i.id}')">+ سجّل وقت</button>
         ${i.stage===2 ? `<button class="btn btn-promote" onclick="promoteItem('${i.id}')">ترقية للمرحلة الأولى</button>` : ''}
@@ -308,7 +370,7 @@ function pickStage(s){
   document.getElementById('stageBtn1').classList.toggle('sel', s===1);
   if(!editingId) document.getElementById('itemTarget').value = s===2 ? 24 : 10000;
 }
-function saveItem(){
+async function saveItem(){
   const name = document.getElementById('itemName').value.trim();
   const target = parseFloat(document.getElementById('itemTarget').value) || (pickedStage===2?24:10000);
   const notes = document.getElementById('itemNotes').value.trim();
@@ -319,20 +381,23 @@ function saveItem(){
   } else {
     items.push({ id: uid(), name, stage: pickedStage, target, logged: 0, status:'active', notes, entries: [], createdAt: now(), updatedAt: now() });
   }
-  saveLocal(); closeModal('itemOverlay'); render(); toast('تم الحفظ');
+  closeModal('itemOverlay'); render();
+  await persist('تم الحفظ');
 }
-function deleteItem(){
+async function deleteItem(){
   if(!editingId) return;
   items = items.filter(x=>x.id!==editingId);
-  saveLocal(); closeModal('itemOverlay'); render(); toast('تم الحذف');
+  closeModal('itemOverlay'); render();
+  await persist('تم الحذف');
 }
-function promoteItem(id){
+async function promoteItem(id){
   const it = items.find(x=>x.id===id);
   if(!it) return;
   if(!confirm(`ترقية "${it.name}" للمرحلة الأولى (10,000 ساعة)؟`)) return;
   it.stage = 1; it.target = 10000; it.updatedAt = now();
   it.entries.push({ date: now(), hours: 0, note: 'تمت الترقية إلى مرحلة الـ10,000 ساعة' });
-  saveLocal(); render(); toast('تمت الترقية 🎉');
+  render();
+  await persist('تمت الترقية 🎉');
 }
 
 // ---- Log time ----
@@ -342,7 +407,7 @@ function openLogModal(id){
   document.getElementById('logNote').value = '';
   openModal('logOverlay');
 }
-function submitLog(){
+async function submitLog(){
   const hrs = parseFloat(document.getElementById('logHours').value);
   const note = document.getElementById('logNote').value.trim();
   if(!hrs || hrs<=0){ toast('اكتب عدد ساعات صحيح'); return; }
@@ -350,7 +415,8 @@ function submitLog(){
   if(!it) return;
   it.entries.push({ date: now(), hours: hrs, note });
   it.logged += hrs; it.updatedAt = now();
-  saveLocal(); closeModal('logOverlay'); render(); toast('تمت الإضافة');
+  closeModal('logOverlay'); render();
+  await persist('تمت الإضافة');
 }
 
 function openModal(id){ document.getElementById(id).classList.add('open'); }
@@ -371,38 +437,56 @@ function saveSettings(){
 }
 function hasValidConfig(){ return CONFIG.WEB_APP_URL && CONFIG.WEB_APP_URL.startsWith('http'); }
 
-async function syncNow(){
-  if(!hasValidConfig()){ toast('ضيف رابط Google Sheets من الإعدادات أول'); openSettings(); return; }
-  toast('جاري المزامنة...');
+async function loadFromSheet(){
+  if(!hasValidConfig()) return false;
   try{
     const res = await fetch(CONFIG.WEB_APP_URL);
     const remote = await res.json();
-    const merged = mergeItems(items, Array.isArray(remote) ? remote : []);
-    items = merged;
-    saveLocal();
+    if(Array.isArray(remote)){
+      items = remote;
+      saveLocal();
+      return true;
+    }
+  }catch(err){ console.error('load from sheet failed', err); }
+  return false;
+}
+
+async function pushToSheet(){
+  if(!hasValidConfig()) return false;
+  try{
     await fetch(CONFIG.WEB_APP_URL, {
       method:'POST',
       headers:{ 'Content-Type':'text/plain;charset=utf-8' },
       body: JSON.stringify(items)
     });
-    render();
-    toast('تمت المزامنة ✓');
-  }catch(err){
-    console.error('sync failed', err);
-    toast('فشلت المزامنة — تأكد من الرابط');
-  }
-}
-function mergeItems(local, remote){
-  const map = {};
-  local.forEach(i=> map[i.id] = i);
-  remote.forEach(r=>{
-    const l = map[r.id];
-    if(!l || new Date(r.updatedAt) > new Date(l.updatedAt)) map[r.id] = r;
-  });
-  return Object.values(map);
+    return true;
+  }catch(err){ console.error('push to sheet failed', err); return false; }
 }
 
-render();
+// يُستدعى بعد أي إضافة/تعديل/حذف: يحفظ محليًا كنسخة احتياطية، والشيت هو المصدر الأساسي
+async function persist(successMsg){
+  saveLocal();
+  if(!hasValidConfig()){ toast(successMsg + ' (بدون شيت مربوط)'); return; }
+  const ok = await pushToSheet();
+  toast(ok ? successMsg + ' في الشيت ✓' : successMsg + ' محليًا فقط — تحقق من الاتصال');
+}
+
+async function syncNow(){
+  if(!hasValidConfig()){ toast('ضيف رابط Google Sheets من الإعدادات أول'); openSettings(); return; }
+  toast('جاري التحديث من الشيت...');
+  const ok = await loadFromSheet();
+  render();
+  toast(ok ? 'تم التحديث من الشيت ✓' : 'فشل الاتصال بالشيت — تحقق من الرابط');
+}
+
+async function init(){
+  if(hasValidConfig()){
+    const ok = await loadFromSheet();
+    if(!ok) toast('تعذّر الاتصال بالشيت — بيتم العرض من آخر نسخة محفوظة');
+  }
+  render();
+}
+init();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
