@@ -40,6 +40,28 @@ header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, var(-
 .brand{display:flex;align-items:center;gap:10px;}
 .brand-mark{width:30px;height:30px;flex:none;}
 header h1{font-size:1.12rem;margin:0;font-weight:800;letter-spacing:.2px;}
+.conn-status{display:flex;align-items:center;gap:5px;font-size:.66rem;color:var(--ink-faint);margin-top:2px;}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--brick);flex:none;transition:.2s;}
+.conn-status.online .conn-dot{background:var(--sage);box-shadow:0 0 6px var(--sage);}
+.conn-status.syncing .conn-dot{background:var(--gold);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+.search-box{display:flex;align-items:center;gap:8px;background:rgba(243,236,220,.06);border:1px solid rgba(243,236,220,.1);border-radius:14px;padding:9px 14px;margin:8px 0 14px;}
+.search-box input{flex:1;background:none;border:none;color:var(--card);font-family:'Cairo';font-size:.85rem;outline:none;}
+.search-box input::placeholder{color:var(--ink-faint);}
+.search-box span{opacity:.6;font-size:.85rem;}
+
+.loading-wrap{text-align:center;padding:60px 20px;color:var(--ink-faint);}
+.spinner{width:26px;height:26px;border:3px solid rgba(243,236,220,.15);border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.history-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(43,38,32,.08);}
+.history-item:last-child{border-bottom:none;}
+.history-hours{font-family:'Space Mono';font-weight:700;color:var(--gold-deep);flex:none;font-size:.88rem;}
+.history-meta{flex:1;}
+.history-note{font-size:.82rem;color:var(--ink);}
+.history-date{font-size:.68rem;color:var(--ink-faint);margin-top:2px;}
+.history-empty{text-align:center;color:var(--ink-sub);padding:24px;font-size:.85rem;}
 header h1 span{color:var(--gold);}
 .header-btns{display:flex;gap:2px;}
 .icon-btn{background:rgba(243,236,220,.06);border:1px solid rgba(243,236,220,.1);color:var(--card);font-size:16px;cursor:pointer;padding:8px;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:.15s;}
@@ -128,7 +150,10 @@ main{padding:4px 14px 20px;}
 <header>
   <div class="brand">
     <svg class="brand-mark" viewBox="0 0 40 40"><polygon points="20,7 28,22 12,22" fill="var(--gold)"/><polygon points="12,24 28,24 33,34 7,34" fill="var(--sage)"/></svg>
-    <h1>هرم <span>الإتقان</span></h1>
+    <div>
+      <h1>هرم <span>الإتقان</span></h1>
+      <div class="conn-status" id="connStatus"><span class="conn-dot"></span><span id="connStatusText">غير متصل</span></div>
+    </div>
   </div>
   <div class="header-btns">
     <button class="icon-btn" onclick="syncNow()" title="مزامنة">⟳</button>
@@ -192,10 +217,12 @@ main{padding:4px 14px 20px;}
   </section>
 
   <section id="sec-s2" class="section">
+    <div class="search-box"><span>🔍</span><input type="text" id="search-s2" placeholder="دوّر بالاسم..." oninput="render()"></div>
     <div id="list-s2"></div>
   </section>
 
   <section id="sec-s1" class="section">
+    <div class="search-box"><span>🔍</span><input type="text" id="search-s1" placeholder="دوّر بالاسم..." oninput="render()"></div>
     <div id="list-s1"></div>
   </section>
 </main>
@@ -209,7 +236,7 @@ main{padding:4px 14px 20px;}
     <h2 id="itemModalTitle">إضافة شيء جديد للتعلّم</h2>
     <div class="field">
       <label>الاسم</label>
-      <input type="text" id="itemName" placeholder="مثال: العزف على العود">
+      <input type="text" id="itemName" placeholder="مثال: العزف على العود" oninput="autoSaveItem()">
     </div>
     <div class="field">
       <label>المرحلة</label>
@@ -220,15 +247,14 @@ main{padding:4px 14px 20px;}
     </div>
     <div class="field">
       <label>هدف الساعات</label>
-      <input type="number" id="itemTarget" value="24" min="1">
+      <input type="number" id="itemTarget" value="24" min="1" oninput="autoSaveItem()">
     </div>
     <div class="field">
       <label>ملاحظات (اختياري)</label>
-      <textarea id="itemNotes" placeholder="ليش هالشي مهم إلك؟"></textarea>
+      <textarea id="itemNotes" placeholder="ليش هالشي مهم إلك؟" oninput="autoSaveItem()"></textarea>
     </div>
     <div class="sheet-actions">
-      <button class="btn btn-ghost" onclick="closeModal('itemOverlay')">إلغاء</button>
-      <button class="btn btn-primary" onclick="saveItem()">حفظ</button>
+      <button class="btn btn-primary" onclick="closeItemModal()">تم</button>
     </div>
     <div class="sheet-actions" id="deleteRow" style="display:none;margin-top:8px;">
       <button class="btn btn-danger" onclick="deleteItem()">حذف هالعنصر</button>
@@ -243,15 +269,26 @@ main{padding:4px 14px 20px;}
     <h2>تسجيل وقت</h2>
     <div class="field">
       <label>عدد الساعات</label>
-      <input type="number" id="logHours" step="0.25" min="0.25" placeholder="مثال: 1.5">
+      <input type="number" id="logHours" step="0.25" min="0.25" placeholder="مثال: 1.5" oninput="autoSaveLog()">
     </div>
     <div class="field">
       <label>ملاحظة (اختياري)</label>
-      <input type="text" id="logNote" placeholder="شو سويت بهالجلسة؟">
+      <input type="text" id="logNote" placeholder="شو سويت بهالجلسة؟" oninput="autoSaveLog()">
     </div>
     <div class="sheet-actions">
-      <button class="btn btn-ghost" onclick="closeModal('logOverlay')">إلغاء</button>
-      <button class="btn btn-primary" onclick="submitLog()">إضافة</button>
+      <button class="btn btn-primary" onclick="closeLogModal()">تم</button>
+    </div>
+  </div>
+</div>
+
+<!-- History modal -->
+<div class="overlay" id="historyOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h2 id="historyTitle">سجلّ الجلسات</h2>
+    <div id="historyList"></div>
+    <div class="sheet-actions" style="margin-top:14px;">
+      <button class="btn btn-ghost" onclick="closeModal('historyOverlay')">إغلاق</button>
     </div>
   </div>
 </div>
@@ -269,9 +306,11 @@ main{padding:4px 14px 20px;}
       انسخ رابط الـ Web App بعد ما تنشر Google Apps Script المرفق (Code.gs)، والصقه هون. البرنامج رح يخزّن كل شي محليًا حتى لو ما ضفت رابط.
     </p>
     <div class="sheet-actions">
-      <button class="btn btn-ghost" onclick="closeModal('settingsOverlay')">إلغاء</button>
+      <button class="btn btn-ghost" onclick="testConnection()">اختبار الاتصال</button>
       <button class="btn btn-primary" onclick="saveSettings()">حفظ</button>
     </div>
+    <div id="connTestResult" style="font-size:.78rem;margin-top:10px;line-height:1.6;"></div>
+    <div style="font-size:.72rem;color:var(--ink-faint);margin-top:14px;" id="lastSyncedLine"></div>
   </div>
 </div>
 
@@ -308,19 +347,22 @@ function render(){
   document.getElementById('stat-total-items').textContent = items.length;
   const totalHours = items.reduce((sum,i)=> sum + (i.logged||0), 0);
   document.getElementById('stat-total-hours').textContent = fmtNum(totalHours);
-  renderList('list-s1', s1, 'var(--gold)', 'var(--gold)');
-  renderList('list-s2', s2, 'var(--sage)', 'var(--sage)');
+  renderList('list-s1', s1, 'var(--gold)', 'var(--gold)', 'search-s1');
+  renderList('list-s2', s2, 'var(--sage)', 'var(--sage)', 'search-s2');
 }
 
-function renderList(elId, list, color, accent){
+function renderList(elId, fullList, color, accent, searchId){
   const el = document.getElementById(elId);
-  if(!list.length){ el.innerHTML = '<div class="empty-hint"><span class="big">🏔️</span>ولا شي هون لسا<br>دوس على «إضافة شيء جديد» تحت</div>'; return; }
+  const q = (document.getElementById(searchId)?.value || '').trim().toLowerCase();
+  const list = q ? fullList.filter(i=> i.name.toLowerCase().includes(q)) : fullList;
+  if(!fullList.length){ el.innerHTML = '<div class="empty-hint"><span class="big">🏔️</span>ولا شي هون لسا<br>دوس على «إضافة شيء جديد» تحت</div>'; return; }
+  if(!list.length){ el.innerHTML = '<div class="empty-hint">ولا نتيجة مطابقة للبحث</div>'; return; }
   list.sort((a,b)=> new Date(b.updatedAt) - new Date(a.updatedAt));
   el.innerHTML = list.map((i,idx)=>{
     const pct = Math.min(100, Math.round((i.logged / i.target) * 100));
     return `<div class="card" style="--accent:${accent};animation-delay:${idx*0.04}s">
       <div class="card-top">
-        <div>
+        <div onclick="openHistory('${i.id}')" style="cursor:pointer;flex:1;">
           <div class="card-name">${escHtml(i.name)}</div>
           ${i.notes ? `<div class="card-notes">${escHtml(i.notes)}</div>` : ''}
         </div>
@@ -339,10 +381,56 @@ function renderList(elId, list, color, accent){
   }).join('');
 }
 
+// ---- History ----
+let historyTargetId = null;
+function openHistory(id){
+  const it = items.find(x=>x.id===id);
+  if(!it) return;
+  historyTargetId = id;
+  document.getElementById('historyTitle').textContent = 'سجلّ الجلسات — ' + it.name;
+  renderHistory();
+  openModal('historyOverlay');
+}
+function renderHistory(){
+  const it = items.find(x=>x.id===historyTargetId);
+  const el = document.getElementById('historyList');
+  if(!it || !it.entries || !it.entries.length){ el.innerHTML = '<div class="history-empty">ولا جلسة متسجّلة لسا</div>'; return; }
+  const entries = it.entries.map((e,idx)=>({...e, idx})).sort((a,b)=> new Date(b.date)-new Date(a.date));
+  el.innerHTML = entries.map(e=>{
+    const d = new Date(e.date);
+    const dateStr = isNaN(d) ? '' : d.toLocaleDateString('ar-EG', {day:'numeric', month:'short', year:'numeric'});
+    return `<div class="history-item">
+      <div class="history-meta">
+        <div class="history-note">${escHtml(e.note) || (e.hours===0 ? 'ترقية مرحلة' : 'بدون ملاحظة')}</div>
+        <div class="history-date">${dateStr}</div>
+      </div>
+      <div class="history-hours">${e.hours>0 ? fmtNum(e.hours)+' س' : ''}</div>
+      <button class="card-menu" onclick="deleteHistoryEntry(${e.idx})" style="font-size:16px;">🗑</button>
+    </div>`;
+  }).join('');
+}
+async function deleteHistoryEntry(idx){
+  const it = items.find(x=>x.id===historyTargetId);
+  if(!it) return;
+  const entry = it.entries[idx];
+  if(!entry) return;
+  if(!confirm('حذف هالجلسة؟')) return;
+  it.logged = Math.max(0, it.logged - (entry.hours||0));
+  it.entries.splice(idx,1);
+  it.updatedAt = now();
+  renderHistory(); render();
+  await persist('تم الحذف');
+}
+
 function fmtNum(n){ return (Math.round(n*100)/100).toString(); }
 function escHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
 
 // ---- Add / Edit item ----
+function debounce(fn, delay){
+  let t;
+  return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), delay); };
+}
+
 function openAddModal(){
   editingId = null;
   document.getElementById('itemModalTitle').textContent = 'إضافة شيء جديد للتعلّم';
@@ -369,20 +457,33 @@ function pickStage(s){
   document.getElementById('stageBtn2').classList.toggle('sel', s===2);
   document.getElementById('stageBtn1').classList.toggle('sel', s===1);
   if(!editingId) document.getElementById('itemTarget').value = s===2 ? 24 : 10000;
+  autoSaveItem();
 }
-async function saveItem(){
+
+// يحفظ العنصر تلقائيًا كل ما المستخدم يكتب — أول حرف بالاسم بينشئ العنصر، وبعدها كل تعديل يحدّثه بنفس المعرف
+function doAutoSaveItem(){
   const name = document.getElementById('itemName').value.trim();
+  if(!name) return; // ما منشئ عنصر لحد ما يكون في اسم
   const target = parseFloat(document.getElementById('itemTarget').value) || (pickedStage===2?24:10000);
   const notes = document.getElementById('itemNotes').value.trim();
-  if(!name){ toast('لازم تكتب اسم'); return; }
   if(editingId){
     const it = items.find(x=>x.id===editingId);
+    if(!it) return;
     it.name = name; it.target = target; it.notes = notes; it.stage = pickedStage; it.updatedAt = now();
   } else {
-    items.push({ id: uid(), name, stage: pickedStage, target, logged: 0, status:'active', notes, entries: [], createdAt: now(), updatedAt: now() });
+    const it = { id: uid(), name, stage: pickedStage, target, logged: 0, status:'active', notes, entries: [], createdAt: now(), updatedAt: now() };
+    items.push(it);
+    editingId = it.id;
+    document.getElementById('deleteRow').style.display = 'flex';
   }
-  closeModal('itemOverlay'); render();
-  await persist('تم الحفظ');
+  render();
+  persist('تم الحفظ');
+}
+const autoSaveItem = debounce(doAutoSaveItem, 600);
+
+function closeItemModal(){
+  doAutoSaveItem();
+  closeModal('itemOverlay');
 }
 async function deleteItem(){
   if(!editingId) return;
@@ -401,33 +502,55 @@ async function promoteItem(id){
 }
 
 // ---- Log time ----
+let pendingLogEntry = null;
 function openLogModal(id){
   logTargetId = id;
+  pendingLogEntry = null;
   document.getElementById('logHours').value = '';
   document.getElementById('logNote').value = '';
   openModal('logOverlay');
 }
-async function submitLog(){
-  const hrs = parseFloat(document.getElementById('logHours').value);
-  const note = document.getElementById('logNote').value.trim();
-  if(!hrs || hrs<=0){ toast('اكتب عدد ساعات صحيح'); return; }
+// يحفظ الوقت تلقائيًا كل ما المستخدم يكتب — أول رقم ساعات صحيح بينشئ سجلّ، وبعدها كل تعديل (ساعات أو ملاحظة) بيحدّث نفس السجلّ
+function doAutoSaveLog(){
   const it = items.find(x=>x.id===logTargetId);
   if(!it) return;
-  it.entries.push({ date: now(), hours: hrs, note });
-  it.logged += hrs; it.updatedAt = now();
-  closeModal('logOverlay'); render();
-  await persist('تمت الإضافة');
+  const hrs = parseFloat(document.getElementById('logHours').value);
+  const note = document.getElementById('logNote').value.trim();
+  if(!hrs || hrs<=0) return;
+  if(!pendingLogEntry){
+    pendingLogEntry = { date: now(), hours: 0, note: '' };
+    it.entries.push(pendingLogEntry);
+  }
+  it.logged += (hrs - pendingLogEntry.hours);
+  pendingLogEntry.hours = hrs;
+  pendingLogEntry.note = note;
+  it.updatedAt = now();
+  render();
+  persist('تم الحفظ');
+}
+const autoSaveLog = debounce(doAutoSaveLog, 600);
+function closeLogModal(){
+  doAutoSaveLog();
+  closeModal('logOverlay');
 }
 
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.overlay').forEach(ov=>{
-  ov.addEventListener('click', e=>{ if(e.target===ov) closeModal(ov.id); });
+  ov.addEventListener('click', e=>{
+    if(e.target!==ov) return;
+    if(ov.id==='itemOverlay') doAutoSaveItem();
+    if(ov.id==='logOverlay') doAutoSaveLog();
+    closeModal(ov.id);
+  });
 });
 
 // ---- Settings / Sync ----
 function openSettings(){
   document.getElementById('webAppUrlInput').value = CONFIG.WEB_APP_URL || '';
+  document.getElementById('connTestResult').textContent = '';
+  const last = localStorage.getItem('pyramid_last_synced');
+  document.getElementById('lastSyncedLine').textContent = last ? ('آخر مزامنة ناجحة: ' + new Date(last).toLocaleString('ar-EG')) : 'ما صارت مزامنة ناجحة لسا';
   openModal('settingsOverlay');
 }
 function saveSettings(){
@@ -437,30 +560,74 @@ function saveSettings(){
 }
 function hasValidConfig(){ return CONFIG.WEB_APP_URL && CONFIG.WEB_APP_URL.startsWith('http'); }
 
+function setConnStatus(state, text){
+  const el = document.getElementById('connStatus');
+  el.className = 'conn-status ' + state;
+  document.getElementById('connStatusText').textContent = text;
+}
+function markSynced(){
+  localStorage.setItem('pyramid_last_synced', now());
+  setConnStatus('online', 'متصل بالشيت');
+}
+
+async function testConnection(){
+  const url = document.getElementById('webAppUrlInput').value.trim();
+  const resultEl = document.getElementById('connTestResult');
+  if(!url || !url.startsWith('http')){ resultEl.textContent = '⚠️ لازم تحط رابط صحيح أول'; resultEl.style.color = 'var(--brick)'; return; }
+  resultEl.textContent = 'جاري الاختبار...'; resultEl.style.color = 'var(--ink-sub)';
+  try{
+    const sep = url.includes('?') ? '&' : '?';
+    const res = await fetch(url + sep + 'action=ping');
+    const data = await res.json();
+    if(data && data.ok){
+      resultEl.style.color = 'var(--sage-deep)';
+      resultEl.textContent = `✓ متصل — الشيت "${data.spreadsheet}" / التبويب "${data.sheet}" (${data.rows} عنصر محفوظ)`;
+    } else {
+      resultEl.style.color = 'var(--brick)';
+      resultEl.textContent = '⚠️ الرابط استجاب بس في خطأ: ' + (data && data.error ? data.error : 'غير معروف');
+    }
+  }catch(err){
+    resultEl.style.color = 'var(--brick)';
+    resultEl.textContent = '✗ ما قدرنا نوصل للرابط — تأكد من النشر (Deploy) والصلاحيات';
+  }
+}
+
 async function loadFromSheet(){
   if(!hasValidConfig()) return false;
+  setConnStatus('syncing', 'جاري الاتصال...');
   try{
     const res = await fetch(CONFIG.WEB_APP_URL);
     const remote = await res.json();
     if(Array.isArray(remote)){
       items = remote;
       saveLocal();
+      markSynced();
       return true;
     }
-  }catch(err){ console.error('load from sheet failed', err); }
+    setConnStatus('offline', 'رد غير متوقع من الشيت');
+  }catch(err){
+    console.error('load from sheet failed', err);
+    setConnStatus('offline', 'غير متصل');
+  }
   return false;
 }
 
 async function pushToSheet(){
   if(!hasValidConfig()) return false;
+  setConnStatus('syncing', 'جاري الحفظ...');
   try{
     await fetch(CONFIG.WEB_APP_URL, {
       method:'POST',
       headers:{ 'Content-Type':'text/plain;charset=utf-8' },
       body: JSON.stringify(items)
     });
+    markSynced();
     return true;
-  }catch(err){ console.error('push to sheet failed', err); return false; }
+  }catch(err){
+    console.error('push to sheet failed', err);
+    setConnStatus('offline', 'فشل الحفظ بالشيت');
+    return false;
+  }
 }
 
 // يُستدعى بعد أي إضافة/تعديل/حذف: يحفظ محليًا كنسخة احتياطية، والشيت هو المصدر الأساسي
@@ -480,9 +647,13 @@ async function syncNow(){
 }
 
 async function init(){
+  document.getElementById('list-s1').innerHTML = '<div class="loading-wrap"><div class="spinner"></div>جاري تحميل بياناتك...</div>';
+  document.getElementById('list-s2').innerHTML = '<div class="loading-wrap"><div class="spinner"></div>جاري تحميل بياناتك...</div>';
   if(hasValidConfig()){
     const ok = await loadFromSheet();
     if(!ok) toast('تعذّر الاتصال بالشيت — بيتم العرض من آخر نسخة محفوظة');
+  } else {
+    setConnStatus('offline', 'بدون شيت مربوط');
   }
   render();
 }
